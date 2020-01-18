@@ -27,6 +27,7 @@ class cube():
         j = self.pos[1]
 
         pygame.draw.rect(surface, self.color, (i*dis+1, j*dis+1, dis-2, dis-2))
+        
         if eyes:
             center = dis // 2
             radius = 3
@@ -79,29 +80,29 @@ class snake():
                     self.dirny = 1
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
 
-            for i,c in enumerate(self.body):
-                p = c.pos[:]
-                if p in self.turns:
-                    turn = self.turns[p]
-                    c.move(turn[0], turn[1])
-                    if i == len(self.body) - 1:
-                        self.turns.pop(p)
+        for i,c in enumerate(self.body):
+            p = c.pos[:]
+            if p in self.turns:
+                turn = self.turns[p]
+                c.move(turn[0], turn[1])
+                if i == len(self.body) - 1:
+                    self.turns.pop(p)
+
+            else:
+                if c.dirnx == -1 and c.pos[0] <= 0: 
+                    c.pos = (c.rows-1, c.pos[1])
+
+                elif c.dirnx == 1 and c.pos[0] >= c.rows-1:
+                    c.pos = (0, c.pos[1])
+
+                elif c.dirny == 1 and c.pos[1] >= c.rows-1:
+                    c.pos = (c.pos[0], 0)
+
+                elif c.dirny == -1 and c.pos[1] <= 0:
+                    c.pos = (c.pos[0], c.rows-1)
 
                 else:
-                    if c.dirnx == -1 and c.pos[0] <= 0: 
-                        c.pos = (c.rows-1, c.pos[1])
-
-                    elif c.dirnx == 1 and c.pos[0] >= c.rows-1:
-                        c.pos = (0, c.pos[1])
-
-                    elif c.dirny == 1 and c.pos[1] >= c.rows-1:
-                        c.pos = (c.pos[0], 0)
-
-                    elif c.dirny == -1 and c.pos[1] <= 0:
-                        c.pos = (c.pos[0], c.rows-1)
-
-                    else:
-                        c.move(c.dirnx, c.dirny)
+                    c.move(c.dirnx, c.dirny)
 
 
     def reset(self, pos):
@@ -146,7 +147,7 @@ def drawGrid(w, rows, surface):
     x = y = 0
     white = (255, 255, 255)
 
-    for linedraw in range(rows):
+    for l in range(rows):
         x += sizeBetween
         y += sizeBetween
 
@@ -180,7 +181,7 @@ def randomSnack(rows, item):
 
 def message_box(subject, content):
     root = tk.Tk()
-    root.atributes("-topmost", True)
+    root.attributes("-topmost", True)
     root.withdraw()
     messagebox.showinfo(subject, content)
     try:
@@ -211,11 +212,13 @@ def main():
         for x in range(len(snk.body)):
             if snk.body[x].pos in list(map( lambda z: z.pos, snk.body[x+1:])):
                 print(f'Score: {len(snk.body)}')
-                #message_box('You Lost!', 'Play again')
+                message_box('You Lost!', 'Play again')
                 snk.reset((10,10))
                 break
 
 
         redrawWindow(window)
+
+    pass
 
 main()
